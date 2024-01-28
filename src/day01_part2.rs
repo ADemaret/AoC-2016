@@ -28,33 +28,33 @@ fn get_answer(input: &str) -> Option<usize> {
     let mut dir_index = 0; // north
     let mut blocks = (0, 0);
     let mut visited_blocks = Vec::new();
-    let mut solution = None;
-    input
+    let instructions = input
         .split([' ', ','])
         .filter(|instr| !instr.is_empty())
-        .for_each(|instr| {
-            match instr.chars().take(1).collect::<Vec<char>>()[0] {
-                'L' => {
-                    dir_index = (dir_index + 3) % 4;
-                }
-                'R' => {
-                    dir_index = (dir_index + 1) % 4;
-                }
-                _ => unreachable!("should be L or R"),
+        .collect::<Vec<_>>();
+    for instr in instructions {
+        match instr.chars().take(1).collect::<Vec<char>>()[0] {
+            'L' => {
+                dir_index = (dir_index + 3) % 4;
             }
-            let val_str = instr.chars().skip(1).collect::<String>();
-            let val = val_str.parse::<isize>().unwrap();
-            for _step in 0..val {
-                blocks.0 += dirs[dir_index].0;
-                blocks.1 += dirs[dir_index].1;
-                if solution.is_none() && visited_blocks.contains(&blocks) {
-                    solution = Some(blocks);
-                } else {
-                    visited_blocks.push(blocks);
-                }
+            'R' => {
+                dir_index = (dir_index + 1) % 4;
             }
-        });
-    solution.map(|(x, y)| (isize::abs(x) + isize::abs(y)) as usize)
+            _ => unreachable!("should be L or R"),
+        }
+        let val_str = instr.chars().skip(1).collect::<String>();
+        let val = val_str.parse::<isize>().unwrap();
+        for _step in 0..val {
+            blocks.0 += dirs[dir_index].0;
+            blocks.1 += dirs[dir_index].1;
+            if visited_blocks.contains(&blocks) {
+                return Some((isize::abs(blocks.0) + isize::abs(blocks.1)) as usize);
+            } else {
+                visited_blocks.push(blocks);
+            }
+        }
+    }
+    None
 }
 
 #[cfg(test)]
