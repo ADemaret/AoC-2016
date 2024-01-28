@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'AoC-2016'",
+            "name": "Debug executable 'aoc-2016'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=AoC-2016",
-                    "--package=AoC-2016"
+                    "--bin=aoc-2016",
+                    "--package=aoc-2016"
                 ],
                 "filter": {
-                    "name": "AoC-2016",
+                    "name": "aoc-2016",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'AoC-2016'",
+            "name": "Debug unit tests in executable 'aoc-2016'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=AoC-2016",
-                    "--package=AoC-2016"
+                    "--bin=aoc-2016",
+                    "--package=aoc-2016"
                 ],
                 "filter": {
-                    "name": "AoC-2016",
+                    "name": "aoc-2016",
                     "kind": "bin"
                 }
             },
