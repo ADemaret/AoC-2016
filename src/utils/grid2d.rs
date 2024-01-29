@@ -33,6 +33,12 @@ impl Grid2D {
             Grid2D { max_l, max_c,grid}
         }
     
+    pub fn new_by_sizes(width:usize,height:usize,default_char:char) -> Grid2D {
+        let max_l = height;
+        let max_c = width;
+        Grid2D { max_l, max_c, grid:vec![vec![default_char; width]; height] }
+    }
+
     ///
     /// Affiche la grille avec numéros de lignes et de colonnes
     /// 
@@ -201,4 +207,40 @@ impl Grid2D {
         }
         Grid2D {max_l:self.max_c, max_c:self.max_l, grid:new_grid}
     }
+
+    pub fn set_rect(&mut self,a: usize, b: usize,ch:char) {
+        for c in 0..a {
+            for l in 0..b {
+                self.grid[l][c] = ch;
+            }
+        }
+    }
+    
+    ///
+    /// shifts all of the pixels in column A down by B pixels
+    ///
+    pub fn shift_col_down( &mut self,col: usize, moves: usize) {
+        let mut new_grid = self.grid.clone();
+        for l in 0..self.max_l {
+            if l + moves >= self.max_l {
+                new_grid[l+moves-self.max_l][col] = self.grid[l][col];
+            } else {
+                new_grid[l+moves][col] = self.grid[l][col];
+            }
+        }
+        self.grid = new_grid;
+    }
+    
+    pub fn shift_row_right(&mut self,row: usize, moves: usize) {
+        let mut new_grid = self.grid.clone();
+        for c in 0..self.max_c {
+            if c + moves >= self.max_c {
+                new_grid[row][c+moves-self.max_c] = self.grid[row][c];
+            } else {
+                new_grid[row][c+moves] = self.grid[row][c];
+            }
+        }
+        self.grid = new_grid;
+    }
+    
 }
