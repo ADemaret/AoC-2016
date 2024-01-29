@@ -9,7 +9,7 @@ use regex::Regex;
 //use crate::utils::math;
 
 pub fn main() {
-    println!("-- Advent of Code - Day 04 - Part 1 --");
+    println!("-- Advent of Code - Day 04 - Part 2 --");
     let now = Instant::now();
 
     // let input = include_str!("../assets/day04_input_demo1.txt");
