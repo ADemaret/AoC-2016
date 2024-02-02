@@ -1,5 +1,4 @@
 use std::time::Instant;
-use thousands::Separable;
 
 use regex::Regex;
 
@@ -31,6 +30,7 @@ struct FileItems {
     marker_chars: usize,
     marker_repeat: usize,
     str_len: usize,
+    str_repeat: usize,
 }
 
 fn get_answer(input: &str) -> usize {
@@ -42,15 +42,7 @@ fn get_answer(input: &str) -> usize {
     // get size
     //let mut size = 0;
     let mut index = 0;
-    let mut sub_vec = Vec::new();
     loop {
-        if v_file_items.len() % 100 == 0 {
-            println!(
-                "index : {} / {}",
-                index.separate_with_commas(),
-                v_file_items.len().separate_with_commas()
-            );
-        }
         let first_element = v_file_items[index].clone();
         if first_element.marker_chars == 0 {
             // just a len a chars
@@ -72,30 +64,24 @@ fn get_answer(input: &str) -> usize {
                     let mut a_file_item = v_file_items[sub_index].clone();
                     a_file_item.str_len = current_len - too_much; // 3
                     v_file_items[sub_index] = a_file_item.clone(); // 3
-                    sub_vec.push(a_file_item.clone()); // 3
+                    v_file_items[sub_index].str_repeat *= repeat;
                     v_file_items.insert(sub_index + 1, a_file_item.clone());
                     v_file_items[sub_index + 1].str_len = too_much; // 1
                 } else {
-                    sub_vec.push(v_file_items[sub_index].clone());
+                    v_file_items[sub_index].str_repeat *= repeat;
                 }
                 sub_index += 1;
             }
 
-            if !sub_vec.is_empty() {
-                sub_vec.reverse();
-                for _ in 0..(repeat - 1) {
-                    for el in &sub_vec {
-                        v_file_items.insert(index + 1, el.clone());
-                    }
-                }
-                v_file_items.remove(index);
-            }
-            sub_vec.clear();
+            v_file_items.remove(index);
 
             // group pure chars
             if v_file_items[0].marker_chars == 0 {
                 while v_file_items.len() > 1 && v_file_items[1].marker_chars == 0 {
-                    v_file_items[0].str_len += v_file_items[1].str_len;
+                    let len = v_file_items[0].str_len * v_file_items[0].str_repeat
+                        + v_file_items[1].str_len * v_file_items[1].str_repeat;
+                    v_file_items[0].str_len = len;
+                    v_file_items[0].str_repeat = 1;
                     v_file_items.remove(1);
                 }
                 index = 1;
@@ -105,7 +91,7 @@ fn get_answer(input: &str) -> usize {
             break;
         }
     }
-    v_file_items.iter().map(|x| x.str_len).sum()
+    v_file_items.iter().map(|x| x.str_len * x.str_repeat).sum()
 }
 
 fn get_file_items(input: &str) -> Vec<FileItems> {
@@ -126,6 +112,7 @@ fn get_file_items(input: &str) -> Vec<FileItems> {
                 if start_len > 0 {
                     ret_vec.push(FileItems {
                         str_len: start_len,
+                        str_repeat: 1,
                         ..Default::default()
                     });
                 }
@@ -154,6 +141,7 @@ fn get_file_items(input: &str) -> Vec<FileItems> {
                     marker_chars,
                     marker_repeat,
                     str_len,
+                    str_repeat: 1,
                 });
                 // println!("end    {:?}", &caps["end"]);
                 str = format!("{:?}", &&caps["end"])
@@ -171,6 +159,7 @@ fn get_file_items(input: &str) -> Vec<FileItems> {
         .len();
     ret_vec.push(FileItems {
         str_len: end_len,
+        str_repeat: 1,
         ..Default::default()
     });
 
@@ -191,7 +180,6 @@ mod tests {
             get_answer("(25x3)(3x3)ABC(2x3)XY(5x2)PQRSTX(18x9)(3x2)TWO(5x7)SEVEN"),
             445
         );
-        // took 1:30 to get the answer !!
         assert_eq!(
             get_answer(include_str!("../assets/day09_input.txt")),
             11658395076
