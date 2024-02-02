@@ -57,16 +57,17 @@ pub fn do_it(
 
 pub fn print_state(floors: &[Vec<Component>], elevator: usize) {
     for f in (0..4).rev() {
-        print!("F{f} ");
+        let mut debug_str = String::new();
+        debug_str.push_str(format!("F{f} ").as_str());
         if elevator == f {
-            print!("E ");
+            debug_str.push_str("E ");
         } else {
-            print!("  ");
+            debug_str.push_str("  ");
         }
         for c in &floors[f] {
-            print!("{} ", c);
+            debug_str.push_str(format!("{} ", c).as_str());
         }
-        println!();
+        debug!("{debug_str}");
     }
 }
 
@@ -145,6 +146,9 @@ fn compatible_components(components: &Vec<Component>) -> bool {
     true
 }
 
+///
+/// are all floors except 4th empty ?
+///
 pub fn is_won(floors: &[Vec<Component>]) -> bool {
     for floor in floors.iter().take(3) {
         if !floor.is_empty() {

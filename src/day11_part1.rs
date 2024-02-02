@@ -1,6 +1,7 @@
 use crate::day11::data::Chemical;
 use crate::day11::data::Equipment;
 use itertools::Itertools;
+use std::collections::VecDeque;
 use std::time::Instant;
 // personal functions
 //use crate::utils::grid2d;
@@ -45,14 +46,92 @@ fn get_answer(input: &str) -> Option<usize> {
     let current_floor = 0;
     //print_state(&floors, current_floor);
 
-    let mut dejavu: DejavuType = Vec::new();
-    let level = 0;
-    dfs(&mut floors, current_floor, &mut dejavu, level)
+    bfs(&mut floors, current_floor)
 }
 
 type DejavuType = Vec<(Vec<Vec<Component>>, usize, isize, (Component, Component))>;
 
-fn dfs(
+fn get_elevator_possibilities(
+    floors: &[Vec<Component>],
+    current_floor: usize,
+) -> Vec<(Component, Component)> {
+    let mut v_in_elevator: Vec<(Component, Component)> = Vec::new();
+    let mut floors_with_none = floors[current_floor].clone();
+    floors_with_none.push(Component {
+        chm: Chemical::None,
+        equ: Equipment::None,
+    });
+    for (a, b) in (0..floors_with_none.len()).tuple_combinations() {
+        v_in_elevator.push((floors_with_none[a], floors_with_none[b]));
+    }
+    v_in_elevator
+}
+
+fn bfs(floors: &mut Vec<Vec<Component>>, current_floor: usize) -> Option<usize> {
+    let mut dejavu: DejavuType = Vec::new();
+    let mut queue = VecDeque::new();
+    let steps = 0;
+
+    // possibilities from start node
+    let v_in_elevator = get_elevator_possibilities(floors, current_floor);
+    for direction in [1, -1] {
+        for in_elevator in &v_in_elevator {
+            queue.push_back((
+                floors.clone(),
+                current_floor,
+                direction,
+                *in_elevator,
+                steps,
+            ));
+        }
+    }
+
+    while let Some((floors, current_floor, direction, in_elevator, steps)) = queue.pop_front() {
+        //println!("Step: {steps}, check: {}", queue.len());
+        //print_state(&floors, current_floor);
+
+        //dejavu.push((floors.clone(), current_floor, direction, in_elevator));
+        // trouvé
+        if is_won(&floors) {
+            debug!("WON !! in {steps}");
+            return Some(steps);
+        }
+
+        let mut new_floors = floors.clone();
+        if is_allowed(&new_floors, current_floor, direction, in_elevator)
+            && !dejavu.contains(&(floors.clone(), current_floor, direction, in_elevator))
+        {
+            // set dejavu
+            dejavu.push((floors.clone(), current_floor, direction, in_elevator));
+
+            // do it
+            let new_floor = do_it(&mut new_floors, current_floor, direction, in_elevator);
+
+            // Check the following neighboring nodes for any that we've not visited yet.
+            let v_in_elevator = get_elevator_possibilities(&new_floors, new_floor);
+            for direction in [1, -1] {
+                for in_elevator in &v_in_elevator {
+                    queue.push_back((
+                        new_floors.clone(),
+                        new_floor,
+                        direction,
+                        *in_elevator,
+                        steps + 1,
+                    ));
+                }
+            }
+            // } else {
+            //     debug!(
+            //         "{},({},{}) not allowed",
+            //         direction, in_elevator.0, in_elevator.1
+            //     );
+        }
+    }
+    // not found
+    None
+}
+
+/*fn dfs(
     floors: &mut Vec<Vec<Component>>,
     current_floor: usize,
     dejavu: &mut DejavuType,
@@ -67,16 +146,7 @@ fn dfs(
 
     // pause::pause();
 
-    let mut v_in_elevator: Vec<(Component, Component)> = Vec::new();
-    let mut floors_with_none = floors[current_floor].clone();
-    floors_with_none.push(Component {
-        chm: Chemical::None,
-        equ: Equipment::None,
-    });
-    for (a, b) in (0..floors_with_none.len()).tuple_combinations() {
-        v_in_elevator.push((floors_with_none[a], floors_with_none[b]));
-    }
-
+    let mut v_in_elevator = get_elevator_possibilities(floors, current_floor);
     let mut debug_string = "possible components in elevator are :".to_string();
     for in_elevator in &v_in_elevator {
         debug_string.push_str(format!("({},{})", in_elevator.0, in_elevator.1).as_str());
@@ -129,7 +199,7 @@ fn dfs(
         }
     }
     min_dist
-}
+}*/
 
 #[cfg(test)]
 mod tests {
