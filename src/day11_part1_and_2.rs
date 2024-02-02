@@ -27,9 +27,16 @@ pub fn main() {
     // let input = include_str!("../assets/day11_input_demo1.txt");
     let input = include_str!("../assets/day11_input.txt");
     if let Some(solution) = get_answer(input) {
-        println!("La réponse est {}", solution);
+        println!("La réponse 1 est {}", solution);
     } else {
-        println!("Pas de réponse trouvée");
+        println!("Pas de réponse trouvée pour 1");
+    }
+
+    let input = include_str!("../assets/day11_part2_input.txt");
+    if let Some(solution) = get_answer(input) {
+        println!("La réponse 2 est {}", solution);
+    } else {
+        println!("Pas de réponse trouvée pour 2");
     }
 
     let elapsed1 = now.elapsed();
@@ -144,6 +151,10 @@ mod tests {
         assert_eq!(
             get_answer(include_str!("../assets/day11_input.txt")),
             Some(37)
+        );
+        assert_eq!(
+            get_answer(include_str!("../assets/day11_part2_input.txt")),
+            Some(61)
         );
     }
 }

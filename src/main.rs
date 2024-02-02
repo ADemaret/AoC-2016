@@ -26,7 +26,7 @@ mod utils;
 // mod day10_part1;
 // mod day10_part2;
 mod day11;
-mod day11_part1;
+mod day11_part1_and_2;
 // mod day11_part2;
 // mod day12_part1;
 // mod day12_part2;
@@ -79,7 +79,7 @@ fn main() -> io::Result<()> {
     // day09_part2::main();
     // day10_part1::main();
     // day10_part2::main();
-    day11_part1::main();
+    day11_part1_and_2::main();
     // day11_part2::main();
     // day12_part1::main();
     // day12_part2::main();

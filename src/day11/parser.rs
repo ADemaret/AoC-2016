@@ -9,7 +9,7 @@ pub fn parse(input: &str) -> Vec<Vec<Component>> {
             let (_, e1) = line.split_once("contains ").unwrap();
             let e2 = e1
                 .split([' ', ','])
-                .filter(|&str| !str.is_empty() && str != "a" && str != "and")
+                .filter(|&str| !str.is_empty() && str != "a" && str != "and" && str != "an")
                 .collect::<Vec<&str>>();
             let mut a_component = Component {
                 ..Default::default()
@@ -20,6 +20,8 @@ pub fn parse(input: &str) -> Vec<Vec<Component>> {
             while a_pair.is_some_and(|p| p.len() == 2) {
                 match &a_pair.unwrap()[0].chars().next().unwrap() {
                     'c' => a_component.chm = Chemical::Curium,
+                    'd' => a_component.chm = Chemical::Dilithium,
+                    'e' => a_component.chm = Chemical::Elerium,
                     'h' => a_component.chm = Chemical::Hydrogen,
                     'l' => a_component.chm = Chemical::Lithium,
                     'p' => a_component.chm = Chemical::Plutonium,
@@ -36,7 +38,7 @@ pub fn parse(input: &str) -> Vec<Vec<Component>> {
                     'm' => a_component.equ = Equipment::Microchip,
                     _ => a_component.equ = Equipment::None,
                 }
-                a_floor.push(a_component.clone());
+                a_floor.push(a_component);
                 a_pair = pairs.next();
             }
             for i in (0..a_floor.len()).rev() {

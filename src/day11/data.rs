@@ -22,6 +22,8 @@ pub enum Chemical {
     #[default]
     None,
     Curium,
+    Dilithium,
+    Elerium,
     Hydrogen,
     Lithium,
     Plutonium,
@@ -33,6 +35,8 @@ impl fmt::Display for Chemical {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Chemical::Curium => write!(f, "C"),
+            Chemical::Dilithium => write!(f, "D"),
+            Chemical::Elerium => write!(f, "E"),
             Chemical::Hydrogen => write!(f, "H"),
             Chemical::Lithium => write!(f, "L"),
             Chemical::Plutonium => write!(f, "P"),
