@@ -24,8 +24,8 @@ pub fn main() {
     // let mut floors = parse(input);
     // day11::demo::execute_demo(&mut floors);
 
-    let input = include_str!("../assets/day11_input.txt");
     // let input = include_str!("../assets/day11_input_demo1.txt");
+    let input = include_str!("../assets/day11_input.txt");
     if let Some(solution) = get_answer(input) {
         println!("La réponse est {}", solution);
     } else {
@@ -49,7 +49,10 @@ fn get_answer(input: &str) -> Option<usize> {
     bfs(&mut floors, current_floor)
 }
 
-type DejavuType = Vec<(Vec<Vec<Component>>, usize, isize, (Component, Component))>;
+// this is the magic trick to avoid checking too much states :
+// it is not the exact microchips/generators at each floor that is important,
+// it is the NUMBER of microchips/generators at each floor !
+type DejavuType = Vec<(Vec<(usize, usize)>, usize)>; //, isize, (Component, Component))>;
 
 fn get_elevator_possibilities(
     floors: &[Vec<Component>],
@@ -98,108 +101,35 @@ fn bfs(floors: &mut Vec<Vec<Component>>, current_floor: usize) -> Option<usize> 
         }
 
         let mut new_floors = floors.clone();
-        if is_allowed(&new_floors, current_floor, direction, in_elevator)
-            && !dejavu.contains(&(floors.clone(), current_floor, direction, in_elevator))
-        {
-            // set dejavu
-            dejavu.push((floors.clone(), current_floor, direction, in_elevator));
-
+        if is_allowed(&new_floors, current_floor, direction, in_elevator) {
             // do it
             let new_floor = do_it(&mut new_floors, current_floor, direction, in_elevator);
 
-            // Check the following neighboring nodes for any that we've not visited yet.
-            let v_in_elevator = get_elevator_possibilities(&new_floors, new_floor);
-            for direction in [1, -1] {
-                for in_elevator in &v_in_elevator {
-                    queue.push_back((
-                        new_floors.clone(),
-                        new_floor,
-                        direction,
-                        *in_elevator,
-                        steps + 1,
-                    ));
+            // set dejavu
+            //dejavu.push((floors.clone(), current_floor, direction, in_elevator));
+            let sum_mg = get_sum_mg(&new_floors);
+            if !dejavu.contains(&(sum_mg.clone(), new_floor)) {
+                dejavu.push((sum_mg, new_floor));
+
+                // Check the following neighboring nodes for any that we've not visited yet.
+                let v_in_elevator = get_elevator_possibilities(&new_floors, new_floor);
+                for direction in [1, -1] {
+                    for in_elevator in &v_in_elevator {
+                        queue.push_back((
+                            new_floors.clone(),
+                            new_floor,
+                            direction,
+                            *in_elevator,
+                            steps + 1,
+                        ));
+                    }
                 }
             }
-            // } else {
-            //     debug!(
-            //         "{},({},{}) not allowed",
-            //         direction, in_elevator.0, in_elevator.1
-            //     );
         }
     }
     // not found
     None
 }
-
-/*fn dfs(
-    floors: &mut Vec<Vec<Component>>,
-    current_floor: usize,
-    dejavu: &mut DejavuType,
-    level: usize,
-) -> Option<usize> {
-    // trouvé
-    if is_won(floors) {
-        debug!("WON !! at level {level}");
-        return Some(0);
-    }
-    debug!("level {level}");
-
-    // pause::pause();
-
-    let mut v_in_elevator = get_elevator_possibilities(floors, current_floor);
-    let mut debug_string = "possible components in elevator are :".to_string();
-    for in_elevator in &v_in_elevator {
-        debug_string.push_str(format!("({},{})", in_elevator.0, in_elevator.1).as_str());
-    }
-    debug!("{}", debug_string);
-
-    let mut min_dist = None;
-    let new_level = level;
-
-    'main_loop: for direction in [1, -1] {
-        for in_elevator in &v_in_elevator {
-            let mut floors_clone = floors.clone();
-            let floors_clone2 = floors.clone();
-
-            if is_allowed(floors, current_floor, direction, *in_elevator)
-                && !dejavu.contains(&(floors_clone.clone(), current_floor, direction, *in_elevator))
-            {
-                // set dejavu
-                dejavu.push((floors_clone.clone(), current_floor, direction, *in_elevator));
-
-                // do it
-                let new_floor = do_it(&mut floors_clone, current_floor, direction, *in_elevator);
-
-                let new_dist = dfs(&mut floors_clone, new_floor, dejavu, new_level + 1);
-
-                // reset dejavu
-                let index = dejavu
-                    .iter()
-                    .position(|x| {
-                        *x == (
-                            floors_clone2.clone(),
-                            current_floor,
-                            direction,
-                            *in_elevator,
-                        )
-                    })
-                    .unwrap();
-                dejavu.remove(index);
-
-                // get min
-                if new_dist.is_some() {
-                    min_dist = Some(min_dist.unwrap_or(usize::MAX).min(new_dist.unwrap() + 1));
-                }
-            } else {
-                debug!(
-                    "{} {}, ({},{}) not allowed ",
-                    current_floor, direction, in_elevator.0, in_elevator.1
-                );
-            }
-        }
-    }
-    min_dist
-}*/
 
 #[cfg(test)]
 mod tests {
@@ -207,13 +137,13 @@ mod tests {
 
     #[test]
     fn test_total() {
-        // assert_eq!(
-        //     get_answer(include_str!("../assets/day11_input_demo1.txt")),
-        //     0
-        // );
+        assert_eq!(
+            get_answer(include_str!("../assets/day11_input_demo1.txt")),
+            Some(11)
+        );
         assert_eq!(
             get_answer(include_str!("../assets/day11_input.txt")),
-            Some(0)
+            Some(37)
         );
     }
 }

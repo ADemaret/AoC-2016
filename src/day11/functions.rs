@@ -55,6 +55,17 @@ pub fn do_it(
     new_floor
 }
 
+pub fn get_sum_mg(floors: &[Vec<Component>]) -> Vec<(usize, usize)> {
+    let mut sum_mg = Vec::new();
+    for f in floors {
+        sum_mg.push((
+            f.iter().filter(|&x| x.equ != Equipment::Microchip).count(),
+            f.iter().filter(|&x| x.equ != Equipment::Generator).count(),
+        ));
+    }
+    sum_mg
+}
+
 pub fn print_state(floors: &[Vec<Component>], elevator: usize) {
     for f in (0..4).rev() {
         let mut debug_str = String::new();

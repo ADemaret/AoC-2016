@@ -4,7 +4,6 @@
 use std::env;
 use std::io;
 
-//mod day11;
 mod utils;
 
 // mod day01_part1;
@@ -23,10 +22,11 @@ mod utils;
 // mod day07_part2;
 // mod day08_part1_and_2;
 // mod day09_part1;
-mod day09_part2;
+// mod day09_part2;
 // mod day10_part1;
 // mod day10_part2;
-// mod day11_part1;
+mod day11;
+mod day11_part1;
 // mod day11_part2;
 // mod day12_part1;
 // mod day12_part2;
@@ -76,10 +76,10 @@ fn main() -> io::Result<()> {
     // day07_part2::main();
     // day08_part1_and_2::main();
     // day09_part1::main();
-    day09_part2::main();
+    // day09_part2::main();
     // day10_part1::main();
     // day10_part2::main();
-    // day11_part1::main();
+    day11_part1::main();
     // day11_part2::main();
     // day12_part1::main();
     // day12_part2::main();
