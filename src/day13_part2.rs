@@ -59,7 +59,6 @@ fn get_answer(input: usize, end_node: Node) -> Option<usize> {
         //dejavu.push((floors.clone(), current_floor, direction, in_elevator));
         // trouvé
         if step == 50 + 1 {
-            // todo
             //println!("WON !! in {step}");
             return Some(dejavu.len());
         }
