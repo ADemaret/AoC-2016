@@ -31,7 +31,6 @@ fn get_answer(input: &str, start: &str) -> String {
     let mut scrambled = start.chars().collect::<Vec<_>>();
     for instr in instructions {
         let buff = scrambled.clone();
-        let len = buff.len();
         match instr[0] {
             "swap" => match instr[1] {
                 "position" => {
