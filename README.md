@@ -1,3 +1,3 @@
 # Advent of Code 2016 (Rust)
 
-In progress...
+Complet solution
