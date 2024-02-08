@@ -6,14 +6,13 @@ use std::time::Instant;
 //use crate::utils::math;
 
 pub fn main() {
-    println!("-- Advent of Code - Day 23 - Part 1 and 2 --");
+    println!("-- Advent of Code - Day 25 - Part 1 and 2 --");
     let now = Instant::now();
 
-    // let input = include_str!("../assets/day23_input_demo1.txt");
-    let input = include_str!("../assets/day23_input.txt");
+    // let input = include_str!("../assets/day25_input_demo1.txt");
+    let input = include_str!("../assets/day25_input.txt");
 
-    println!("La réponse 1 est {}", get_answer(input, 7));
-    println!("La réponse 2 est {}", get_answer(input, 12));
+    println!("La réponse est {}", get_answer(input));
 
     let elapsed1 = now.elapsed();
     println!("Elapsed: {:.2?}", elapsed1);
@@ -21,9 +20,9 @@ pub fn main() {
 
 //
 
-fn get_answer(input: &str, c_value: isize) -> isize {
+fn get_answer(input: &str) -> isize {
     // parse
-    let mut instructions: Vec<(&str, &str, &str)> = input
+    let instructions: Vec<(&str, &str, &str)> = input
         .lines()
         .map(|line| {
             let chunks = line
@@ -31,17 +30,34 @@ fn get_answer(input: &str, c_value: isize) -> isize {
                 .filter(|x| !x.is_empty())
                 .collect::<Vec<&str>>();
             match chunks[0] {
-                "inc" | "dec" | "tgl" => (chunks[0], chunks[1], ""),
+                "inc" | "dec" | "out" => (chunks[0], chunks[1], ""),
                 "cpy" | "jnz" => (chunks[0], chunks[1], chunks[2]),
                 _ => unreachable!("should be a valid instruction"),
             }
         })
         .collect();
 
-    let mut register = [0; 4];
-    register[0] = c_value;
+    let mut solution = 0;
+    let mut clock = String::new();
+    while !clock.contains("010101010101010") && solution < 160 {
+        solution += 1;
+        clock = follow_instructions(&instructions, solution);
+    }
+    // println!("{solution} - {clock}");
+    solution
+}
+
+fn get_register_index(register: &str) -> usize {
+    (register.chars().next().unwrap() as u8 - b'a') as usize
+}
+
+fn follow_instructions(instructions: &Vec<(&str, &str, &str)>, register_a: isize) -> String {
+    let mut clock = String::new();
+    let mut counter = 0;
     let mut current = 0;
-    while current < instructions.len() {
+    let mut register = [0; 4];
+    register[0] = register_a;
+    while current < instructions.len() && counter < 100_000 {
         // println!("line {} : {:?}", current, instructions[current]);
         let (instr, str1, str2) = instructions[current];
         // print!("instr {} : {:?}", current, instructions[current]);
@@ -99,49 +115,17 @@ fn get_answer(input: &str, c_value: isize) -> isize {
                     current += 1;
                 }
             }
-            "tgl" => {
-                let next;
-                if let Ok(val) = str1.parse::<isize>() {
-                    if val != 0 {
-                        next = (current as isize + str1.parse::<isize>().unwrap()) as usize;
-                    } else {
-                        next = current;
-                    }
-                } else {
-                    let reg_index = get_register_index(str1);
-                    if register[reg_index] != 0 {
-                        next = (current as isize + register[reg_index]) as usize;
-                    } else {
-                        next = current;
-                    }
-                }
-                if next < instructions.len() {
-                    if instructions[next].2.is_empty() {
-                        // one-argument instructions
-                        if instructions[next].0 == "inc" {
-                            instructions[next].0 = "dec";
-                        } else {
-                            instructions[next].0 = "inc";
-                        }
-                    } else {
-                        // two-argument instructions
-                        if instructions[next].0 == "jnz" {
-                            instructions[next].0 = "cpy";
-                        } else {
-                            instructions[next].0 = "jnz";
-                        }
-                    }
-                }
+            "out" => {
+                let reg_index = get_register_index(str1);
+                let c = format!("{}", register[reg_index]);
+                clock.push(c.chars().next().unwrap());
                 current += 1;
             }
             _ => unreachable!(),
         }
+        counter += 1;
     }
-    register[0]
-}
-
-fn get_register_index(register: &str) -> usize {
-    (register.chars().next().unwrap() as u8 - b'a') as usize
+    clock
 }
 
 #[cfg(test)]
@@ -150,17 +134,6 @@ mod tests {
 
     #[test]
     fn test_total() {
-        assert_eq!(
-            get_answer(include_str!("../assets/day23_input_demo1.txt"), 7),
-            3
-        );
-        assert_eq!(
-            get_answer(include_str!("../assets/day23_input.txt"), 7),
-            12860
-        );
-        assert_eq!(
-            get_answer(include_str!("../assets/day23_input.txt"), 12),
-            479009420
-        );
+        assert_eq!(get_answer(include_str!("../assets/day25_input.txt")), 158);
     }
 }
